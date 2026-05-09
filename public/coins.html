@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Coin Rewards — NexusRewards</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><div class="nav-logo-icon">NX</div><span class="nav-logo-text">Nexus<span>Rewards</span></span></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/">Home</a><a href="/earn">Earn Coins</a><a href="/redeem">Redeem Code</a><a href="/coins">Coin Rewards</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <div class="nav-coin-badge" id="nav-coin-badge" style="display:none" onclick="window.location='/earn'"><span class="coin-icon">🪙</span><span class="coin-amt">0</span></div>
+      <a href="/profile" class="nav-icon-btn">📦</a><a href="/leaderboard" class="nav-icon-btn">🏆</a>
+      <div id="nav-auth-area"><a href="/auth/discord" class="nav-auth-btn">Login with Discord</a></div>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger">☰</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-badge">🪙 Coin Rewards</div>
+      <h1 class="section-title" style="font-size:2.5rem">Spend <span class="italic">IQCoins</span></h1>
+      <p class="section-sub" style="margin:0 auto">Exchange your IQCoins for real gaming rewards — no code needed.</p>
+    </div>
+  </div>
+
+  <section class="section-sm">
+    <div class="container">
+      <!-- BALANCE -->
+      <div class="balance-hero" id="balance-hero">
+        <div class="balance-coin">
+          <div class="balance-coin-icon">🪙</div>
+          <div>
+            <div class="balance-amount" id="coins-balance">—</div>
+            <div class="balance-label">Available IQCoins</div>
+          </div>
+        </div>
+        <a href="/earn" class="btn btn-gold">Earn More →</a>
+      </div>
+
+      <!-- GRID -->
+      <div class="coins-grid" id="coins-grid">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-logo">Nexus<span>Rewards</span></div><div class="footer-links"><a href="/earn">How It Works</a><a href="/coins">Shop</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div><div class="footer-support">Support: <a href="mailto:mojangstudio908@gmail.com">mojangstudio908@gmail.com</a></div><div class="footer-copy">© 2025 NexusRewards — All rights reserved</div></div></footer>
+</div>
+
+<div id="toast-wrap" class="toast-wrap"></div>
+<script src="script.js"></script>
+<script>
+const COINS_DATA = [
+  { key:'mc',  tag:'MINECRAFT',    tagClass:'tag-mc',        icon:'⚔️',  name:'Minecraft Reward',  desc:'Server exclusive Minecraft reward.',                  cost:'5,00,00,000', value:'₹899' },
+  { key:'rb',  tag:'ROBLOX $50',   tagClass:'tag-rb',        icon:'🎮',  name:'Roblox $50 Plan',   desc:'$50 plan credits added to your account.',             cost:'8,00,00,000', value:'₹1,499' },
+  { key:'rb100',tag:'ROBLOX $100', tagClass:'tag-rb100',     icon:'🎯',  name:'Roblox $100 Plan',  desc:'$100 plan credits for your account.',                 cost:'12,00,00,000',value:'₹2,499' },
+  { key:'xbox', tag:'XBOX',        tagClass:'tag-xbox',      icon:'🎮',  name:'Xbox Game Pass',    desc:'Ultimate activation for your account.',               cost:'7,00,00,000', value:'₹1,999' },
+  { key:'nitro',tag:'BASIC YEARLY',tagClass:'tag-nitro',     icon:'💎',  name:'Nitro Basic',       desc:'Nitro Basic yearly plan gifted to account.',          cost:'6,00,00,000', value:'₹1,199/yr' },
+  { key:'nitroboost',tag:'BOOST YEARLY',tagClass:'tag-nitroboost',icon:'🚀',name:'Nitro Boost',   desc:'Nitro Boost yearly + 2 server boosts gifted.',        cost:'20,00,00,000',value:'₹5,999/yr' }
+];
+
+function renderCoins(balance) {
+  const grid = document.getElementById('coins-grid');
+  grid.innerHTML = COINS_DATA.map(r => `
+    <div class="coin-reward-card">
+      <div class="coin-reward-tag ${r.tagClass}">${r.tag}</div>
+      <span class="coin-reward-icon">${r.icon}</span>
+      <div class="coin-reward-name">${r.name}</div>
+      <div class="coin-reward-desc">${r.desc}</div>
+      <div class="coin-reward-cost">🪙 ${r.cost} IQCoins</div>
+      <div class="coin-reward-price">≈ ${r.value}</div>
+      <a href="/redeem" class="coin-reward-redeem">Redeem →</a>
+    </div>`).join('');
+}
+
+async function loadCoinsBalance() {
+  if (!authUser) { renderCoins(0); return; }
+  const r = await apiGet(`/api/available-coins/${encodeURIComponent(authUser.userId)}`);
+  const bal = (r.ok && r.data.success) ? r.data.balance : 0;
+  const el = document.getElementById('coins-balance');
+  if (el) animCount(el, bal);
+  renderCoins(bal);
+}
+
+renderCoins(0);
+setTimeout(loadCoinsBalance, 300);
+document.addEventListener('authLoaded', loadCoinsBalance);
+</script>
+</body></html>

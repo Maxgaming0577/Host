@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Redeem Code — NexusRewards</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><div class="nav-logo-icon">NX</div><span class="nav-logo-text">Nexus<span>Rewards</span></span></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/">Home</a><a href="/earn">Earn Coins</a><a href="/redeem">Redeem Code</a><a href="/coins">Coin Rewards</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <div class="nav-coin-badge" id="nav-coin-badge" style="display:none" onclick="window.location='/earn'"><span class="coin-icon">🪙</span><span class="coin-amt">0</span></div>
+      <a href="/profile" class="nav-icon-btn">📦</a><a href="/leaderboard" class="nav-icon-btn">🏆</a>
+      <div id="nav-auth-area"><a href="/auth/discord" class="nav-auth-btn">Login with Discord</a></div>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger">☰</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-badge">🎟️ Redeem Code</div>
+      <h1 class="section-title" style="font-size:2.5rem">Redeem Your <span class="italic">Code</span></h1>
+      <p class="section-sub" style="margin:0 auto">Select your platform, verify your account and enter your code to activate your reward.</p>
+    </div>
+  </div>
+
+  <section class="section-sm">
+    <div class="container" style="max-width:820px">
+
+      <!-- PLATFORM SELECT STEP -->
+      <div id="step-platform" class="card" style="padding:2rem;margin-bottom:1.5rem">
+        <h2 style="font-weight:800;font-size:1.1rem;margin-bottom:0.35rem">Select your platform</h2>
+        <p style="color:var(--muted);font-size:0.85rem;margin-bottom:1.5rem">Choose the reward you received a code for.</p>
+        <div class="platform-grid" id="platform-grid">
+          <div class="platform-card" data-key="mc" onclick="selectPlatform(this)">
+            <div class="platform-card-icon">⚔️</div>
+            <div><div class="platform-card-name">Minecraft</div><div class="platform-card-price">₹899 Reward</div><div class="platform-card-select">Select →</div></div>
+          </div>
+          <div class="platform-card" data-key="rb" onclick="selectPlatform(this)">
+            <div class="platform-card-icon">🎮</div>
+            <div><div class="platform-card-name">Roblox</div><div class="platform-card-price">₹1,499+ Reward</div><div class="platform-card-select">Select →</div></div>
+          </div>
+          <div class="platform-card" data-key="xbox" onclick="selectPlatform(this)">
+            <div class="platform-card-icon">🎯</div>
+            <div><div class="platform-card-name">Xbox Game Pass</div><div class="platform-card-price">₹1,999 Reward</div><div class="platform-card-select">Select →</div></div>
+          </div>
+          <div class="platform-card" data-key="nitro" onclick="selectPlatform(this)">
+            <div class="platform-card-icon">💎</div>
+            <div><div class="platform-card-name">Discord Nitro</div><div class="platform-card-price">₹1,199+ Reward</div><div class="platform-card-select">Select →</div></div>
+          </div>
+          <div class="platform-card" data-key="nitroboost" onclick="selectPlatform(this)">
+            <div class="platform-card-icon">🚀</div>
+            <div><div class="platform-card-name">Nitro Boost</div><div class="platform-card-price">₹5,999/yr Reward</div><div class="platform-card-select">Select →</div></div>
+          </div>
+          <div class="platform-card" data-key="rb100" onclick="selectPlatform(this)">
+            <div class="platform-card-icon">🎯</div>
+            <div><div class="platform-card-name">Roblox $100</div><div class="platform-card-price">₹2,499 Reward</div><div class="platform-card-select">Select →</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CODE ENTRY STEP (shown after platform selected) -->
+      <div id="step-code" style="display:none">
+        <div class="card" style="padding:2rem">
+          <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1.5rem">
+            <button onclick="resetPlatform()" style="background:var(--bg);border:1px solid var(--border);border-radius:8px;padding:0.4rem 0.8rem;cursor:pointer;font-size:0.8rem;color:var(--muted)">← Back</button>
+            <div>
+              <h2 style="font-weight:800;font-size:1.1rem" id="step-title">Enter Code</h2>
+              <p style="color:var(--muted);font-size:0.82rem" id="step-sub">Paste your reward code below</p>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Reward Code</label>
+            <input type="text" id="code-input" class="form-input code-input" placeholder="XXXXX-XXXXX-XXXXX-XXXXX-XXXXX" maxlength="29" autocomplete="off">
+            <div id="code-preview" style="margin-top:0.5rem;font-size:0.8rem;color:var(--muted)"></div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Discord ID or Email</label>
+            <input type="text" id="user-id-input" class="form-input" placeholder="e.g. 123456789012345678">
+            <div style="font-size:0.75rem;color:var(--muted2);margin-top:0.35rem">Links this reward to your account. Must match your registered ID.</div>
+          </div>
+
+          <button class="btn btn-primary w-full" id="redeem-btn" onclick="doRedeem()" disabled style="padding:1rem;font-size:0.95rem">
+            Activate Reward
+          </button>
+          <div id="form-err" style="color:#dc2626;font-size:0.82rem;margin-top:0.75rem;display:none"></div>
+        </div>
+
+        <!-- RESULTS -->
+        <div id="result-success" class="result-panel success" style="margin-top:1.25rem">
+          <div class="result-panel-title">✅ Reward Activated!</div>
+          <div class="invoice-grid" id="inv-grid"></div>
+          <p style="color:#166534;font-size:0.82rem;margin-top:0.75rem">Your reward will be delivered within <strong>72 hours</strong>. Track it in <a href="/profile" style="color:var(--purple)">Orders</a>.</p>
+          <div style="display:flex;gap:0.75rem;margin-top:1rem;flex-wrap:wrap">
+            <button onclick="copyInv()" class="btn btn-ghost btn-sm">📋 Copy Invoice #</button>
+            <a href="/profile" class="btn btn-outline btn-sm">📦 Track Order</a>
+          </div>
+        </div>
+        <div id="result-error" class="result-panel error" style="margin-top:1.25rem">
+          <div class="result-panel-title">❌ Redemption Failed</div>
+          <p id="err-msg" style="color:#7f1d1d;font-size:0.875rem;margin-top:0.4rem"></p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+  <footer><div class="footer-inner"><div class="footer-logo">Nexus<span>Rewards</span></div><div class="footer-links"><a href="/earn">How It Works</a><a href="/coins">Shop</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div><div class="footer-support">Support: <a href="mailto:mojangstudio908@gmail.com">mojangstudio908@gmail.com</a></div><div class="footer-copy">© 2025 NexusRewards — All rights reserved</div></div></footer>
+</div>
+
+<div id="toast-wrap" class="toast-wrap"></div>
+<script src="script.js"></script>
+<script>
+let selPlatform = null;
+let lastInvoice = null;
+let checkTmr = null;
+
+function selectPlatform(el) {
+  document.querySelectorAll('.platform-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  selPlatform = el.dataset.key;
+  const r = REWARDS[selPlatform];
+  document.getElementById('step-title').textContent = `Enter your ${r.name} code`;
+  document.getElementById('step-sub').textContent = `Paste the code you received for ${r.name} (${r.value})`;
+  document.getElementById('step-platform').style.display = 'none';
+  document.getElementById('step-code').style.display = 'block';
+  // prefill userId
+  const uid = document.getElementById('user-id-input');
+  if (uid && authUser) uid.value = authUser.userId;
+  else if (uid && Session.userId) uid.value = Session.userId;
+  validateForm();
+}
+
+function resetPlatform() {
+  document.getElementById('step-platform').style.display = 'block';
+  document.getElementById('step-code').style.display = 'none';
+  document.getElementById('result-success').classList.remove('show');
+  document.getElementById('result-error').classList.remove('show');
+  selPlatform = null;
+}
+
+const codeEl = () => document.getElementById('code-input');
+const userEl = () => document.getElementById('user-id-input');
+
+function validateForm() {
+  const btn = document.getElementById('redeem-btn');
+  btn.disabled = !(selPlatform && codeEl().value.length === 29 && userEl().value.trim().length > 3);
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  const c = codeEl(), u = userEl();
+  if(c) c.addEventListener('input', () => { validateForm(); clearTimeout(checkTmr); if(c.value.length===29) checkTmr = setTimeout(()=>previewCode(c.value), 700); else document.getElementById('code-preview').textContent=''; });
+  if(u) u.addEventListener('input', () => { Session.userId = u.value.trim(); validateForm(); });
+});
+
+async function previewCode(code) {
+  const el = document.getElementById('code-preview');
+  el.textContent = 'Checking…';
+  const r = await apiGet(`/api/check-code/${encodeURIComponent(code)}`);
+  if (!r.ok || !r.data.exists) { el.innerHTML = '<span style="color:#dc2626">⚠️ Code not found</span>'; return; }
+  if (r.data.used) { el.innerHTML = '<span style="color:#d97706">🔒 Already redeemed</span>'; return; }
+  el.innerHTML = `<span style="color:#16a34a">✓ Valid — ${r.data.rewardName} (${r.data.rewardValue})</span>`;
+}
+
+async function doRedeem() {
+  const code = codeEl().value, userId = userEl().value.trim();
+  const btn = document.getElementById('redeem-btn');
+  document.getElementById('result-success').classList.remove('show');
+  document.getElementById('result-error').classList.remove('show');
+  document.getElementById('form-err').style.display = 'none';
+
+  if (code.length !== 29) { showFormErr('Enter a complete code.'); return; }
+  if (userId.length < 4) { showFormErr('Enter your Discord ID or email.'); return; }
+
+  setBtn(btn, 'loading', 'Activate Reward');
+  const [_, r] = await Promise.all([new Promise(res => setTimeout(res, 1000)), apiPost('/api/redeem', { code, userId })]);
+
+  if (r.ok && r.data.success) {
+    lastInvoice = r.data.invoiceNumber;
+    showSuccess(r.data);
+    Toast.show('🎉 Reward activated! Check your inbox.', 'success', 6000);
+    setBtn(btn, 'success', 'Activate Reward');
+    setTimeout(() => setBtn(btn, 'reset', 'Activate Reward'), 4000);
+  } else {
+    showRedeemErr(r.data.error || 'Redemption failed.');
+    setBtn(btn, 'error', 'Activate Reward');
+    setTimeout(() => setBtn(btn, 'reset', 'Activate Reward'), 3000);
+  }
+}
+
+function showSuccess(d) {
+  document.getElementById('inv-grid').innerHTML = `
+    <div class="invoice-row"><span class="lbl">Invoice #</span><span class="val purple">${d.invoiceNumber}</span></div>
+    <div class="invoice-row"><span class="lbl">Reward</span><span class="val">${d.reward.name}</span></div>
+    <div class="invoice-row"><span class="lbl">Value</span><span class="val green">${d.reward.value}</span></div>
+    <div class="invoice-row"><span class="lbl">Status</span><span class="val"><span class="status-badge status-processing">⏳ Processing</span></span></div>
+    <div class="invoice-row"><span class="lbl">Delivery</span><span class="val">Within 72 hours</span></div>`;
+  document.getElementById('result-success').classList.add('show');
+}
+function showRedeemErr(msg) { document.getElementById('err-msg').textContent = msg; document.getElementById('result-error').classList.add('show'); }
+function showFormErr(msg) { const el = document.getElementById('form-err'); el.textContent = msg; el.style.display = 'block'; }
+function copyInv() { if(lastInvoice) { navigator.clipboard.writeText(lastInvoice); Toast.show('Invoice # copied!', 'success'); } }
+</script>
+</body></html>

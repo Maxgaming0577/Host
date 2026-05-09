@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Track Orders — NexusRewards</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><div class="nav-logo-icon">NX</div><span class="nav-logo-text">Nexus<span>Rewards</span></span></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/">Home</a><a href="/earn">Earn Coins</a><a href="/redeem">Redeem Code</a><a href="/coins">Coin Rewards</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <div class="nav-coin-badge" id="nav-coin-badge" style="display:none" onclick="window.location='/earn'"><span class="coin-icon">🪙</span><span class="coin-amt">0</span></div>
+      <a href="/profile" class="nav-icon-btn">📦</a><a href="/leaderboard" class="nav-icon-btn">🏆</a>
+      <div id="nav-auth-area"><a href="/auth/discord" class="nav-auth-btn">Login with Discord</a></div>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger">☰</button>
+  </div>
+</nav>
+<div class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-badge">📦 Order Tracking</div>
+      <h1 class="section-title" style="font-size:2.5rem">Track Your <span class="italic">Orders</span></h1>
+      <p class="section-sub" style="margin:0 auto">View your redemption history and download PDF invoices.</p>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container" style="max-width:900px">
+      <!-- SEARCH CARD -->
+      <div class="search-card mb-3">
+        <div style="display:flex;gap:0.5rem;margin-bottom:1.25rem">
+          <button class="lb-tab active" id="tab-uid" onclick="switchTab('uid',this)">🆔 By User ID / Email</button>
+          <button class="lb-tab" id="tab-inv" onclick="switchTab('inv',this)">🧾 By Invoice Number</button>
+        </div>
+        <div id="panel-uid">
+          <div class="search-row">
+            <input type="text" id="uid-input" class="form-input" placeholder="Enter Discord ID or Email" style="flex:1">
+            <button class="btn btn-primary" onclick="searchByUser()">Search</button>
+          </div>
+        </div>
+        <div id="panel-inv" style="display:none">
+          <div class="search-row">
+            <input type="text" id="inv-input" class="form-input" placeholder="e.g. WS-K3X9M2-7H4P" style="flex:1;text-transform:uppercase">
+            <button class="btn btn-primary" onclick="searchByInvoice()">Find</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="results-area" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem">
+          <h2 style="font-weight:800;font-size:1.1rem">Redemption History <span id="result-count" style="color:var(--muted);font-weight:400;font-size:0.9rem"></span></h2>
+        </div>
+        <div class="table-card" id="orders-table"></div>
+      </div>
+
+      <div id="single-inv-area" style="display:none">
+        <div class="card" id="single-inv-card"></div>
+      </div>
+
+      <div id="empty-area" style="display:none">
+        <div class="empty-state"><div class="empty-icon">📭</div><div class="empty-title">No orders found</div><div class="empty-sub">Try a different ID or <a href="/redeem" style="color:var(--purple)">redeem a code</a> first.</div></div>
+      </div>
+    </div>
+  </section>
+  <footer><div class="footer-inner"><div class="footer-logo">Nexus<span>Rewards</span></div><div class="footer-links"><a href="/earn">How It Works</a><a href="/coins">Shop</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div><div class="footer-support">Support: <a href="mailto:mojangstudio908@gmail.com">mojangstudio908@gmail.com</a></div><div class="footer-copy">© 2025 NexusRewards — All rights reserved</div></div></footer>
+</div>
+<div id="toast-wrap" class="toast-wrap"></div>
+<script src="script.js"></script>
+<script>
+let currentTab = 'uid';
+let ordersData = [];
+
+function switchTab(tab, btn) {
+  currentTab = tab;
+  document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('panel-uid').style.display = tab === 'uid' ? 'block' : 'none';
+  document.getElementById('panel-inv').style.display = tab === 'inv' ? 'block' : 'none';
+}
+
+// Auto-load if logged in
+document.addEventListener('DOMContentLoaded', () => {
+  const uid = Session.userId;
+  if (uid) document.getElementById('uid-input').value = uid;
+});
+
+async function searchByUser() {
+  const uid = document.getElementById('uid-input').value.trim();
+  if (!uid) { Toast.show('Enter a user ID or email.', 'warning'); return; }
+  Session.userId = uid;
+  const r = await apiGet(`/api/invoices/${encodeURIComponent(uid)}`);
+  if (!r.ok || !r.data.success || !r.data.invoices.length) { showEmpty(); return; }
+  ordersData = r.data.invoices;
+  renderTable(ordersData);
+}
+
+async function searchByInvoice() {
+  const inv = document.getElementById('inv-input').value.trim().toUpperCase();
+  if (!inv) { Toast.show('Enter an invoice number.', 'warning'); return; }
+  const r = await apiGet(`/api/invoices/find/${encodeURIComponent(inv)}`);
+  if (!r.ok || !r.data.success) { Toast.show('Invoice not found.', 'error'); showEmpty(); return; }
+  renderSingle(r.data.invoice);
+}
+
+function renderTable(orders) {
+  document.getElementById('results-area').style.display = 'block';
+  document.getElementById('single-inv-area').style.display = 'none';
+  document.getElementById('empty-area').style.display = 'none';
+  document.getElementById('result-count').textContent = `(${orders.length} order${orders.length !== 1 ? 's' : ''})`;
+  const rows = orders.map(o => {
+    const hrs = o.hoursRemaining || 0;
+    return `<tr>
+      <td><code style="color:var(--purple);font-size:0.78rem">${o.invoiceNumber}</code></td>
+      <td><strong>${o.rewardName || '—'}</strong></td>
+      <td style="color:var(--gold2);font-weight:700">${o.rewardValue || '—'}</td>
+      <td style="color:var(--muted);font-size:0.8rem">${fmtDate(o.redeemedAt)}</td>
+      <td><span class="status-badge status-processing">⏳ Processing</span></td>
+      <td style="font-size:0.8rem;color:var(--muted)">${hrs > 0 ? hrs + 'h left' : 'Processing'}</td>
+      <td><button class="btn btn-xs btn-ghost" onclick='dlPDF(${JSON.stringify(o).replace(/'/g,"\\'")})'  >📄 PDF</button></td>
+    </tr>`;
+  }).join('');
+  document.getElementById('orders-table').innerHTML = `<table><thead><tr><th>Invoice #</th><th>Reward</th><th>Value</th><th>Date</th><th>Status</th><th>Delivery</th><th></th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+
+function renderSingle(inv) {
+  document.getElementById('results-area').style.display = 'none';
+  document.getElementById('single-inv-area').style.display = 'block';
+  document.getElementById('empty-area').style.display = 'none';
+  const hrs = inv.hoursRemaining || 0;
+  document.getElementById('single-inv-card').innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem;margin-bottom:1.5rem">
+      <div><div style="font-weight:800;font-size:1.2rem;color:var(--green)">✅ Invoice Found</div><div style="color:var(--muted);font-size:0.82rem">Redemption record</div></div>
+      <button class="btn btn-primary btn-sm" onclick='dlPDF(${JSON.stringify(inv).replace(/'/g,"\\'")})'>📄 Download PDF</button>
+    </div>
+    <div class="invoice-grid">
+      <div class="invoice-row"><span class="lbl">Invoice #</span><span class="val purple">${inv.invoiceNumber}</span></div>
+      <div class="invoice-row"><span class="lbl">Reward</span><span class="val">${inv.rewardName || '—'}</span></div>
+      <div class="invoice-row"><span class="lbl">Value</span><span class="val green">${inv.rewardValue || '—'}</span></div>
+      <div class="invoice-row"><span class="lbl">User ID</span><span class="val">${inv.userId}</span></div>
+      <div class="invoice-row"><span class="lbl">Redeemed</span><span class="val">${fmtDate(inv.redeemedAt)}</span></div>
+      <div class="invoice-row"><span class="lbl">Status</span><span class="val"><span class="status-badge status-processing">⏳ Processing</span></span></div>
+      <div class="invoice-row"><span class="lbl">Delivery</span><span class="val">${hrs > 0 ? hrs + ' hours remaining' : 'Processing — reward being prepared'}</span></div>
+    </div>
+    <div style="background:#fef9c3;border:1px solid #fde047;border-radius:8px;padding:1rem;margin-top:1rem;font-size:0.82rem;color:#78350f">
+      ⏳ <strong>Status: Processing</strong> — All orders remain in processing status until manually fulfilled by our team.
+    </div>`;
+}
+
+function showEmpty() {
+  document.getElementById('results-area').style.display = 'none';
+  document.getElementById('single-inv-area').style.display = 'none';
+  document.getElementById('empty-area').style.display = 'block';
+}
+
+function dlPDF(order) {
+  try {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+    // Header
+    doc.setFillColor(91, 63, 248); doc.rect(0, 0, 210, 38, 'F');
+    doc.setFillColor(124, 92, 252); doc.rect(0, 32, 210, 8, 'F');
+    doc.setTextColor(255,255,255); doc.setFontSize(22); doc.setFont('helvetica','bold');
+    doc.text('NexusRewards', 18, 20);
+    doc.setFontSize(9); doc.setFont('helvetica','normal'); doc.setTextColor(220,210,255);
+    doc.text('Premium Gaming Rewards Platform', 18, 28);
+    doc.setTextColor(255,255,255); doc.setFontSize(10); doc.setFont('helvetica','bold');
+    doc.text('TAX INVOICE', 210-18, 20, { align:'right' });
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.text(order.invoiceNumber, 210-18, 28, { align:'right' });
+    // Body
+    doc.setTextColor(13,10,30);
+    const rows = [
+      ['Invoice Number', order.invoiceNumber],
+      ['Reward', order.rewardName || '—'],
+      ['Value', order.rewardValue || '—'],
+      ['User ID / Email', order.userId],
+      ['Redeemed On', fmtDate(order.redeemedAt)],
+      ['Status', 'Processing'],
+      ['Estimated Delivery', 'Within 72 hours of redemption'],
+      ['Platform', (order.webKey || '').toUpperCase() || '—'],
+    ];
+    let y = 58;
+    rows.forEach(([k, v]) => {
+      doc.setFillColor(245,242,255); doc.roundedRect(18, y-5, 80, 10, 2, 2, 'F');
+      doc.setFont('helvetica','bold'); doc.setFontSize(8.5); doc.setTextColor(91,63,248);
+      doc.text(k, 22, y);
+      doc.setFont('helvetica','normal'); doc.setTextColor(13,10,30);
+      doc.text(String(v), 105, y);
+      y += 14;
+    });
+    // Notice
+    doc.setFillColor(255,249,196); doc.roundedRect(18, y+6, 174, 22, 3, 3, 'F');
+    doc.setDrawColor(253,224,71); doc.setLineWidth(0.5); doc.roundedRect(18, y+6, 174, 22, 3, 3, 'S');
+    doc.setTextColor(120,53,15); doc.setFont('helvetica','bold'); doc.setFontSize(9);
+    doc.text('⏳  Status: Processing', 24, y+15);
+    doc.setFont('helvetica','normal'); doc.setFontSize(8);
+    doc.text('Your reward is being prepared. Delivery within 72 hours. Contact support if delayed.', 24, y+22, { maxWidth:160 });
+    // Footer
+    doc.setDrawColor(230,225,255); doc.setLineWidth(0.3); doc.line(18, 272, 192, 272);
+    doc.setTextColor(150,140,180); doc.setFontSize(7.5);
+    doc.text('NexusRewards — nexusrewards.gg  |  support: mojangstudio908@gmail.com', 105, 278, { align:'center' });
+    doc.text(`Generated ${new Date().toLocaleString()}  |  Keep this invoice for your records.`, 105, 283, { align:'center' });
+    doc.save(`NexusRewards-${order.invoiceNumber}.pdf`);
+    Toast.show('PDF downloaded!', 'success');
+  } catch(e) { console.error(e); Toast.show('PDF generation failed.', 'error'); }
+}
+
+// Auto search if logged in
+setTimeout(() => {
+  if (authUser) {
+    document.getElementById('uid-input').value = authUser.userId;
+    searchByUser();
+  }
+}, 600);
+</script>
+</body></html>

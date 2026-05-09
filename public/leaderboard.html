@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leaderboard — NexusRewards</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><div class="nav-logo-icon">NX</div><span class="nav-logo-text">Nexus<span>Rewards</span></span></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/">Home</a><a href="/earn">Earn Coins</a><a href="/redeem">Redeem Code</a><a href="/coins">Coin Rewards</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <div class="nav-coin-badge" id="nav-coin-badge" style="display:none" onclick="window.location='/earn'"><span class="coin-icon">🪙</span><span class="coin-amt">0</span></div>
+      <a href="/profile" class="nav-icon-btn">📦</a><a href="/leaderboard" class="nav-icon-btn">🏆</a>
+      <div id="nav-auth-area"><a href="/auth/discord" class="nav-auth-btn">Login with Discord</a></div>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger">☰</button>
+  </div>
+</nav>
+<div class="page">
+  <div class="page-hero">
+    <div class="container" style="text-align:center">
+      <div class="page-badge">🏆 Rankings</div>
+      <h1 class="section-title" style="font-size:2.5rem"><span class="italic">Leaderboard</span></h1>
+      <p class="section-sub" style="margin:0 auto">Top earners in the NexusRewards ecosystem. Updated in real time.</p>
+    </div>
+  </div>
+  <section class="section-sm">
+    <div class="container" style="max-width:860px">
+      <!-- TABS -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:1.5rem;flex-wrap:wrap;gap:0.75rem">
+        <div class="lb-tabs" id="lb-tabs">
+          <button class="lb-tab active" onclick="switchLb('coins',this)">🪙 IQCoins</button>
+          <button class="lb-tab" onclick="switchLb('invites',this)">👥 Invites</button>
+          <button class="lb-tab" onclick="switchLb('messages',this)">💬 Messages</button>
+          <button class="lb-tab" onclick="switchLb('redemptions',this)">🎁 Redeems</button>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="loadLB()">🔄 Refresh</button>
+      </div>
+
+      <!-- PODIUM -->
+      <div class="lb-podium" id="lb-podium">
+        <div class="empty-state" style="width:100%"><div class="empty-icon">⏳</div><div>Loading…</div></div>
+      </div>
+
+      <!-- LIST -->
+      <div class="lb-list" id="lb-list"></div>
+
+      <!-- PRIZES -->
+      <div style="margin-top:3rem">
+        <h2 style="font-weight:800;font-size:1.2rem;margin-bottom:1.25rem;text-align:center">🎖️ Monthly Prizes</h2>
+        <div class="prizes-grid">
+          <div class="prize-card" style="border-top:3px solid var(--gold)">
+            <div class="prize-medal">🥇</div>
+            <div class="prize-rank" style="color:var(--gold2)">1st Place</div>
+            <div class="prize-desc">Discord Nitro Boost (yearly)<br>+ 500,000 bonus IQCoins<br>+ Exclusive Discord role</div>
+          </div>
+          <div class="prize-card" style="border-top:3px solid #94a3b8">
+            <div class="prize-medal">🥈</div>
+            <div class="prize-rank" style="color:#64748b">2nd Place</div>
+            <div class="prize-desc">Discord Nitro Basic (yearly)<br>+ 250,000 bonus IQCoins<br>+ VIP Discord role</div>
+          </div>
+          <div class="prize-card" style="border-top:3px solid #cd7f32">
+            <div class="prize-medal">🥉</div>
+            <div class="prize-rank" style="color:#cd7f32">3rd Place</div>
+            <div class="prize-desc">Xbox Game Pass (1 month)<br>+ 100,000 bonus IQCoins</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <footer><div class="footer-inner"><div class="footer-logo">Nexus<span>Rewards</span></div><div class="footer-links"><a href="/earn">How It Works</a><a href="/coins">Shop</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div><div class="footer-support">Support: <a href="mailto:mojangstudio908@gmail.com">mojangstudio908@gmail.com</a></div><div class="footer-copy">© 2025 NexusRewards — All rights reserved</div></div></footer>
+</div>
+<div id="toast-wrap" class="toast-wrap"></div>
+<script src="script.js"></script>
+<script>
+let lbData = {};
+let curTab = 'coins';
+
+async function loadLB() {
+  document.getElementById('lb-list').innerHTML = '<div class="empty-state"><div class="empty-icon">⏳</div><div>Fetching from database…</div></div>';
+  const r = await apiGet('/api/leaderboard');
+  if (!r.ok || !r.data.success) {
+    document.getElementById('lb-list').innerHTML = '<div class="empty-state"><div class="empty-icon">😞</div><div>Could not load leaderboard.</div></div>';
+    return;
+  }
+  lbData = { coins: r.data.topCoins||[], invites: r.data.topInvites||[], messages: r.data.topMessages||[], redemptions: r.data.topRedemptions||[] };
+  renderPodium(lbData[curTab]);
+  renderList(lbData[curTab], curTab);
+}
+
+function switchLb(tab, btn) {
+  curTab = tab;
+  document.querySelectorAll('.lb-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (lbData[tab]) { renderPodium(lbData[tab]); renderList(lbData[tab], tab); }
+}
+
+function scoreKey(tab) { return { coins:'balance', invites:'totalInvites', messages:'totalMessages', redemptions:'totalRedemptions' }[tab]; }
+function scoreLabel(tab) { return { coins:'🪙', invites:'👥', messages:'💬', redemptions:'🎁' }[tab]; }
+
+function renderPodium(list) {
+  const top3 = list.slice(0,3);
+  if (!top3.length) { document.getElementById('lb-podium').innerHTML = '<div class="empty-state" style="width:100%"><div class="empty-icon">🏆</div><div>No data yet</div></div>'; return; }
+  const order = top3.length >= 3 ? [top3[1], top3[0], top3[2]] : top3;
+  const heights = ['130px','160px','110px'];
+  const medals = ['🥈','🥇','🥉'];
+  const border = ['#94a3b8','var(--gold)','#cd7f32'];
+  const rankNums = [2,1,3];
+  document.getElementById('lb-podium').innerHTML = order.map((u,i) => {
+    const score = u[scoreKey(curTab)] || 0;
+    const av = u.discordAvatar ? `<img src="${u.discordAvatar}" alt="">` : (u.discordUsername||u.userId||'?').charAt(0).toUpperCase();
+    const name = (u.discordUsername || u.userId || '?').substring(0,14);
+    return `<div class="podium-item">
+      <div style="font-size:1.5rem;text-align:center;margin-bottom:0.4rem">${medals[i]}</div>
+      <div class="podium-block podium-${rankNums[i]}" style="height:${heights[i]};border-top-color:${border[i]}">
+        <div class="podium-avatar">${av}</div>
+        <div class="podium-name">${name}</div>
+        <div class="podium-score">${scoreLabel(curTab)} ${fmtNum(score)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderList(list, tab) {
+  const rest = list.slice(3);
+  if (!list.length) { document.getElementById('lb-list').innerHTML = '<div class="empty-state"><div class="empty-icon">📊</div><div>No data for this category</div></div>'; return; }
+  if (!rest.length) { document.getElementById('lb-list').innerHTML = ''; return; }
+  const numClass = (i) => i===0?'gold':i===1?'silver':i===2?'bronze':'';
+  document.getElementById('lb-list').innerHTML = rest.map((u,i) => {
+    const rank = i+4;
+    const score = u[scoreKey(tab)] || 0;
+    const av = u.discordAvatar ? `<img src="${u.discordAvatar}" alt="">` : (u.discordUsername||u.userId||'?').charAt(0).toUpperCase();
+    const name = u.discordUsername || u.userId || '—';
+    return `<div class="lb-row">
+      <div class="lb-num">#${rank}</div>
+      <div class="lb-avatar">${av}</div>
+      <div class="lb-info"><div class="lb-name">${name}</div><div class="lb-sub">Member</div></div>
+      <div class="lb-score">${scoreLabel(tab)} ${fmtNum(score)}</div>
+    </div>`;
+  }).join('');
+}
+
+loadLB();
+</script>
+</body></html>

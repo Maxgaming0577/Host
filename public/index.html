@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NexusRewards — Earn. Redeem. Elevate.</title>
+<meta name="description" content="Earn IQCoins through Discord activity and redeem for real gaming rewards. Minecraft, Roblox, Xbox Game Pass, Discord Nitro.">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><div class="nav-logo-icon">NX</div><span class="nav-logo-text">Nexus<span>Rewards</span></span></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/">Home</a><a href="/earn">Earn Coins</a><a href="/redeem">Redeem Code</a><a href="/coins">Coin Rewards</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <div class="nav-coin-badge" id="nav-coin-badge" style="display:none" onclick="window.location='/earn'"><span class="coin-icon">🪙</span><span class="coin-amt">0</span></div>
+      <a href="/profile" class="nav-icon-btn" title="Track Order">📦</a>
+      <a href="/leaderboard" class="nav-icon-btn" title="Leaderboard">🏆</a>
+      <div id="nav-auth-area"><a href="/auth/discord" class="nav-auth-btn">Login with Discord</a></div>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger">☰</button>
+  </div>
+</nav>
+
+<div class="page">
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-orb hero-orb-1"></div>
+    <div class="hero-orb hero-orb-2"></div>
+    <div style="position:relative;z-index:1;max-width:700px">
+      <div class="hero-badge"><span class="hero-badge-dot"></span>Gaming Rewards Platform — 2025</div>
+      <h1 class="hero-title">
+        <span class="line-bold">Earn.</span>
+        <span class="line-serif">Redeem.</span>
+        <span class="line-bold">Elevate.</span>
+      </h1>
+      <p class="hero-sub">Earn IQCoins through Discord activity — invites, messages, daily rewards &amp; ads — then redeem for real gaming rewards delivered within 72h.</p>
+      <div class="hero-ctas">
+        <a href="/auth/discord" class="btn btn-primary btn-lg">🚀 Start Earning — Free</a>
+        <a href="/redeem" class="btn btn-outline btn-lg">🎟️ I Have a Code</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS STRIP -->
+  <div class="stats-strip" id="stats-strip">
+    <div class="stat-pill"><div class="stat-pill-num" id="stat-members">—</div><div class="stat-pill-label">Members</div></div>
+    <div class="stat-pill"><div class="stat-pill-num">72h</div><div class="stat-pill-label">Activation</div></div>
+    <div class="stat-pill"><div class="stat-pill-num" id="stat-rewards">6</div><div class="stat-pill-label">Rewards</div></div>
+    <div class="stat-pill"><div class="stat-pill-num">100%</div><div class="stat-pill-label">Secure</div></div>
+    <div class="stat-pill"><div class="stat-pill-num">24/7</div><div class="stat-pill-label">Support</div></div>
+  </div>
+
+  <!-- FEATURES -->
+  <section class="section">
+    <div class="container">
+      <div style="text-align:center;margin-bottom:3rem">
+        <span class="section-label">Why Choose Us</span>
+        <h2 class="section-title">Everything you need to<br>level up your <span class="italic">gaming</span></h2>
+        <p class="section-sub" style="margin:0 auto">No subscriptions. No hidden fees. Just earn and redeem.</p>
+      </div>
+      <div class="features-grid">
+        <div class="feature-card"><div class="feature-icon">🪙</div><div class="feature-title">Earn IQCoins Free</div><div class="feature-desc">Stack coins through daily logins, Discord messages, inviting friends, and watching short ads. No payment needed.</div></div>
+        <div class="feature-card"><div class="feature-icon">🎮</div><div class="feature-title">Premium Rewards</div><div class="feature-desc">Redeem for Minecraft, Roblox, Xbox Game Pass, Discord Nitro and more. All legitimate, all real.</div></div>
+        <div class="feature-card"><div class="feature-icon">⚡</div><div class="feature-title">Fast Activation</div><div class="feature-desc">Rewards activated within 72 hours of redemption. Average delivery is just 12–24 hours.</div></div>
+        <div class="feature-card"><div class="feature-icon">🔒</div><div class="feature-title">Secure &amp; Safe</div><div class="feature-desc">Discord OAuth login. We never see or store your gaming passwords. Every transaction is logged and invoiced.</div></div>
+        <div class="feature-card"><div class="feature-icon">📄</div><div class="feature-title">PDF Invoices</div><div class="feature-desc">Download a professional PDF invoice for every redemption. Track all your orders in real time.</div></div>
+        <div class="feature-card"><div class="feature-icon">🎉</div><div class="feature-title">Live Giveaways</div><div class="feature-desc">Join regular giveaways on our Discord server for a chance to win bonus rewards and extra IQCoins.</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AVAILABLE REWARDS -->
+  <section class="section" style="background:var(--white);border-top:1px solid var(--border);border-bottom:1px solid var(--border)">
+    <div class="container">
+      <div style="margin-bottom:2rem">
+        <div class="section-label">Available Rewards</div>
+        <h2 class="section-title">What you can <span class="italic">redeem</span></h2>
+        <p class="section-sub">Use codes or IQCoins to unlock these rewards instantly.</p>
+      </div>
+      <div class="reward-mini-grid">
+        <div class="reward-mini-card" onclick="window.location='/coins'"><div class="reward-mini-icon">⚔️</div><div class="reward-mini-name">Minecraft</div><div class="reward-mini-price">from ₹899</div></div>
+        <div class="reward-mini-card" onclick="window.location='/coins'"><div class="reward-mini-icon">🎮</div><div class="reward-mini-name">Roblox</div><div class="reward-mini-price">from ₹1,499</div></div>
+        <div class="reward-mini-card" onclick="window.location='/coins'"><div class="reward-mini-icon">🎯</div><div class="reward-mini-name">Xbox Pass</div><div class="reward-mini-price">from ₹1,999</div></div>
+        <div class="reward-mini-card" onclick="window.location='/coins'"><div class="reward-mini-icon">💎</div><div class="reward-mini-name">Discord Nitro</div><div class="reward-mini-price">from ₹1,199</div></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BLOCK -->
+  <section class="section">
+    <div class="container">
+      <div class="cta-block">
+        <h2>Ready to start earning?</h2>
+        <p>Join 12,000+ members earning free gaming rewards every day. It takes under 60 seconds to get started.</p>
+        <div class="cta-btns">
+          <a href="/auth/discord" class="btn btn-white btn-lg">Login with Discord</a>
+          <a href="/earn" class="btn btn-white-outline btn-lg">How it works →</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div class="footer-logo">Nexus<span>Rewards</span></div>
+      <div class="footer-links">
+        <a href="/earn">How It Works</a><a href="/coins">Shop</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a>
+      </div>
+      <div class="footer-support">Support: <a href="mailto:mojangstudio908@gmail.com">mojangstudio908@gmail.com</a></div>
+      <div class="footer-copy">© 2025 NexusRewards — All rights reserved</div>
+    </div>
+  </footer>
+</div>
+
+<a href="https://discord.gg/your-invite" target="_blank" class="chat-bubble" title="Join Discord">💬</a>
+<div id="toast-wrap" class="toast-wrap"></div>
+<script src="script.js"></script>
+<script>
+async function loadStats() {
+  const r = await apiGet('/api/stats');
+  if(r.ok && r.data.success) {
+    const m = document.getElementById('stat-members');
+    const rw = document.getElementById('stat-rewards');
+    if(m) animCount(m, r.data.totalMembers);
+    if(rw) animCount(rw, r.data.activeRewards);
+  }
+}
+loadStats();
+</script>
+</body></html>

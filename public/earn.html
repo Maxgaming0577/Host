@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Earn IQCoins — NexusRewards</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="nav">
+  <div class="nav-inner">
+    <a href="/" class="nav-logo"><div class="nav-logo-icon">NX</div><span class="nav-logo-text">Nexus<span>Rewards</span></span></a>
+    <div class="nav-links" id="nav-links">
+      <a href="/">Home</a><a href="/earn">Earn Coins</a><a href="/redeem">Redeem Code</a><a href="/coins">Coin Rewards</a>
+    </div>
+    <div class="nav-right" id="nav-right">
+      <div class="nav-coin-badge" id="nav-coin-badge" style="display:none" onclick="window.location='/earn'"><span class="coin-icon">🪙</span><span class="coin-amt">0</span></div>
+      <a href="/profile" class="nav-icon-btn">📦</a><a href="/leaderboard" class="nav-icon-btn">🏆</a>
+      <div id="nav-auth-area"><a href="/auth/discord" class="nav-auth-btn">Login with Discord</a></div>
+    </div>
+    <button class="nav-hamburger" id="nav-hamburger">☰</button>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-hero">
+    <div class="container">
+      <div class="page-badge">⚡ Earn IQCoins</div>
+      <h1 class="section-title" style="font-size:2.5rem">Earn <span class="italic">IQCoins</span></h1>
+      <p class="section-sub" style="margin:0 auto">Stack up coins through free activities and redeem for premium gaming rewards.</p>
+      <!-- Live balance bar -->
+      <div id="earn-balance-box" style="display:none;margin-top:2rem;background:var(--white);border:1px solid var(--border);border-radius:var(--radius-lg);padding:1.5rem 2rem;max-width:400px;margin-left:auto;margin-right:auto;display:flex;align-items:center;gap:1rem">
+        <div style="font-size:2.5rem">🪙</div>
+        <div>
+          <div style="font-weight:800;font-size:1.8rem;color:var(--gold2)" id="earn-balance-num">0</div>
+          <div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:700">Available IQCoins</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="earn-grid" id="earn-grid">
+        <!-- Daily Claim -->
+        <div class="earn-card">
+          <span class="earn-card-icon">📅</span>
+          <div class="earn-card-title">Daily Claim</div>
+          <div class="earn-card-desc">Come back every 24 hours to claim your free IQCoins. Never miss a day!</div>
+          <div class="earn-card-reward">🪙 +1,000 IQCoins</div>
+          <button class="btn btn-primary w-full" id="daily-btn" onclick="claimDaily()" style="margin-top:0.5rem">Claim Daily Reward</button>
+          <div style="font-size:0.75rem;color:var(--muted);margin-top:0.5rem;text-align:center" id="daily-countdown"></div>
+        </div>
+        <!-- Discord Messages -->
+        <div class="earn-card">
+          <span class="earn-card-icon">💬</span>
+          <div class="earn-card-title">Discord Messages</div>
+          <div class="earn-card-desc">Every 50 messages you send in our Discord server earns you IQCoins automatically via our bot.</div>
+          <div class="earn-card-reward">🪙 +5,000 per 50 msgs</div>
+          <a href="https://discord.gg/your-invite" target="_blank" class="btn btn-ghost w-full" style="margin-top:0.5rem">Open Discord →</a>
+        </div>
+        <!-- Invite Friends -->
+        <div class="earn-card">
+          <span class="earn-card-icon">👥</span>
+          <div class="earn-card-title">Invite Friends</div>
+          <div class="earn-card-desc">Every 5 members you invite to our Discord server earns you IQCoins via the invite tracker bot.</div>
+          <div class="earn-card-reward" style="background:#f0fdf4;color:#16a34a">🤖 Tracked by Discord Bot</div>
+          <a href="https://discord.gg/your-invite" target="_blank" class="btn btn-ghost w-full" style="margin-top:0.5rem">Get Invite Link →</a>
+        </div>
+        <!-- Giveaways -->
+        <div class="earn-card">
+          <span class="earn-card-icon">🎉</span>
+          <div class="earn-card-title">Join Giveaways</div>
+          <div class="earn-card-desc">Participate in regular giveaways on Discord. Winners receive large IQCoin bonuses and free rewards.</div>
+          <div class="earn-card-reward">🪙 Variable Prizes</div>
+          <a href="/giveaways" class="btn btn-ghost w-full" style="margin-top:0.5rem">View Giveaways →</a>
+        </div>
+        <!-- Leaderboard -->
+        <div class="earn-card">
+          <span class="earn-card-icon">🏆</span>
+          <div class="earn-card-title">Climb the Leaderboard</div>
+          <div class="earn-card-desc">Top earners get exclusive bonus rewards and special Discord roles. Check your rank on the Profile page.</div>
+          <div class="earn-card-reward">🪙 Exclusive Bonuses</div>
+          <a href="/leaderboard" class="btn btn-ghost w-full" style="margin-top:0.5rem">View Profile →</a>
+        </div>
+        <!-- Redeem Code bonus -->
+        <div class="earn-card" style="border-color:var(--border2);background:var(--purple-bg)">
+          <span class="earn-card-icon">🎟️</span>
+          <div class="earn-card-title">Have a Code?</div>
+          <div class="earn-card-desc">Already received a reward code from us? Redeem it instantly — no coins needed. Delivered in 72h.</div>
+          <div class="earn-card-reward" style="background:#ede9fe;color:var(--purple)">🎁 Direct Redemption</div>
+          <a href="/redeem" class="btn btn-primary w-full" style="margin-top:0.5rem">Redeem Code →</a>
+        </div>
+      </div>
+
+      <!-- COIN REQUIREMENTS -->
+      <div class="coin-req-section">
+        <div class="coin-req-title">💡 How Many Coins Do I Need?</div>
+        <div class="coin-req-sub">Here's a quick reference for coin requirements per reward:</div>
+        <div class="coin-ref-grid">
+          <div class="coin-ref-card"><span class="coin-ref-icon">⚔️</span><div class="coin-ref-name">Minecraft</div><div class="coin-ref-cost">5,00,00,000 IQCoins = ₹899</div></div>
+          <div class="coin-ref-card"><span class="coin-ref-icon">🎮</span><div class="coin-ref-name">Roblox $50</div><div class="coin-ref-cost">8,00,00,000 IQCoins = ₹1,499</div></div>
+          <div class="coin-ref-card"><span class="coin-ref-icon">🎯</span><div class="coin-ref-name">Xbox Game Pass</div><div class="coin-ref-cost">7,00,00,000 IQCoins = ₹1,999</div></div>
+          <div class="coin-ref-card"><span class="coin-ref-icon">💎</span><div class="coin-ref-name">Discord Nitro Basic</div><div class="coin-ref-cost">6,00,00,000 IQCoins = ₹1,199</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer><div class="footer-inner"><div class="footer-logo">Nexus<span>Rewards</span></div><div class="footer-links"><a href="/earn">How It Works</a><a href="/coins">Shop</a><a href="/about">About</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div><div class="footer-support">Support: <a href="mailto:mojangstudio908@gmail.com">mojangstudio908@gmail.com</a></div><div class="footer-copy">© 2025 NexusRewards — All rights reserved</div></div></footer>
+</div>
+
+<a href="https://discord.gg/your-invite" target="_blank" class="chat-bubble">💬</a>
+<div id="toast-wrap" class="toast-wrap"></div>
+<script src="script.js"></script>
+<script>
+let countdownInterval = null;
+
+async function loadEarnBalance() {
+  if (!authUser) return;
+  const r = await apiGet(`/api/available-coins/${encodeURIComponent(authUser.userId)}`);
+  if (r.ok && r.data.success) {
+    const box = document.getElementById('earn-balance-box');
+    const num = document.getElementById('earn-balance-num');
+    if (box) box.style.display = 'flex';
+    if (num) animCount(num, r.data.balance || 0);
+    if (r.data.lastDailyClaim) {
+      const next = new Date(r.data.lastDailyClaim).getTime() + 24*60*60*1000;
+      if (Date.now() < next) {
+        const btn = document.getElementById('daily-btn');
+        if (btn) { btn.disabled = true; btn.textContent = 'Already Claimed'; }
+        if (countdownInterval) clearInterval(countdownInterval);
+        countdownInterval = countdown(next, document.getElementById('daily-countdown'), () => {
+          const b = document.getElementById('daily-btn');
+          if (b) { b.disabled = false; b.textContent = 'Claim Daily Reward'; }
+        });
+      }
+    }
+  }
+}
+
+async function claimDaily() {
+  if (!authUser) { openLoginModal(); return; }
+  const btn = document.getElementById('daily-btn');
+  setBtn(btn, 'loading', 'Claim Daily Reward');
+  const r = await apiPost(`/api/daily-claim/${encodeURIComponent(authUser.userId)}`);
+  if (r.ok && r.data.success) {
+    Toast.show(`🎉 +1,000 IQCoins added! Balance: ${r.data.balance.toLocaleString()}`, 'success');
+    const num = document.getElementById('earn-balance-num');
+    if (num) animCount(num, r.data.balance);
+    btn.disabled = true; btn.innerHTML = '✓ Claimed!'; btn.style.background = '#16a34a';
+    const next = new Date(r.data.claimedAt).getTime() + 24*60*60*1000;
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = countdown(next, document.getElementById('daily-countdown'), () => {
+      btn.disabled = false; btn.innerHTML = 'Claim Daily Reward'; btn.style.background = '';
+    });
+    // Update nav coin badge
+    const badge = document.querySelector('.coin-amt');
+    if (badge) badge.textContent = r.data.balance.toLocaleString();
+  } else {
+    Toast.show(r.data.error || 'Claim failed.', 'error');
+    setBtn(btn, 'reset', 'Claim Daily Reward');
+  }
+}
+
+document.addEventListener('authLoaded', loadEarnBalance);
+setTimeout(loadEarnBalance, 500);
+</script>
+</body></html>
